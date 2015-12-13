@@ -147,6 +147,21 @@ GMail.Client.prototype.get = Meteor.wrapAsync(function (id, cb) {
   });
 });
 
+// Fetches an attachment from a message
+GMail.Client.prototype.getAttachement = Meteor.wrapAsync(function (messageId, id, cb) {
+  var self = this;
+  self._ensureToken();
+  var urlBase = `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}/attachments/`;
+
+  increaseFacts();
+  HTTP.get(urlBase + id, { params: {
+    'access_token': self.credentials.accessToken
+  } }, function (err, res) {
+    res.data.data = decodeBase64(res.data.data);
+    cb(err, res && res.data);
+  });
+});
+
 // Fetches a list of messages matching query, implements the logic of paging and
 // fetching each individual message
 GMail.Client.prototype.list = Meteor.wrapAsync(function (query, params, cb) {
